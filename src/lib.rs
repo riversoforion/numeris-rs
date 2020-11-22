@@ -1,66 +1,24 @@
-use std::convert::TryFrom;
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RomanNumeral {
-    value: u32
+pub fn integer_to_roman(_val: u32) -> String {
+    String::from("")
 }
 
-impl RomanNumeral {
-    pub fn value(&self) -> u32 {
-        self.value
-    }
+pub fn roman_to_integer(_numeral: &str) -> Result<u32, ParsingError> {
+    Ok(0)
 }
-
-impl From<u32> for RomanNumeral {
-    fn from(value: u32) -> Self {
-        RomanNumeral { value }
-    }
-}
-
-impl TryFrom<&str> for RomanNumeral {
-    type Error = ParsingError;
-
-    fn try_from(_value: &str) -> Result<Self, Self::Error> {
-        Ok(RomanNumeral { value: 0 })
-    }
-}
-
-impl Into<u32> for RomanNumeral {
-    fn into(self) -> u32 {
-        self.value
-    }
-}
-
-impl Into<u64> for RomanNumeral {
-    fn into(self) -> u64 {
-        self.value as u64
-    }
-}
-
-impl Into<i64> for RomanNumeral {
-    fn into(self) -> i64 {
-        self.value as i64
-    }
-}
-
-impl Into<String> for RomanNumeral {
-    fn into(self) -> String {
-        String::from("")
-    }
-}
-
-// Other implementations
-// Add/AddAssign<RomanNumeral|u32|u16|u8>
-// Sub/SubAssign<RomanNumeral|u32|u16|u8>
-// RangeBounds
-// Display
 
 pub enum ParsingError {}
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+    fn convert_x_to_10() {}
+
+    #[test]
+    fn convert_10_to_x() {}
+
+    #[test]
+    fn convert_mcxlii_to_1142() {}
+
+    #[test]
+    fn convert_1142_to_mcxlii() {}
 }
