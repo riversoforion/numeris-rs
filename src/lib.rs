@@ -61,48 +61,126 @@ pub enum RomanNumeralError {}
 
 #[cfg(test)]
 mod tests {
-    use super::{integer_to_roman, ATOMS, DIGITS, MAX_VALUE, MIN_VALUE, VALUES_TO_SYMBOLS};
+    use super::{ATOMS, DIGITS, VALUES_TO_SYMBOLS};
 
-    #[test]
-    fn convert_x_to_10() {}
+    mod itor {
+        use crate::{integer_to_roman, MAX_VALUE, MIN_VALUE};
 
-    #[test]
-    fn convert_10_to_x() {
-        let roman = integer_to_roman(10);
-        assert_eq!(roman, String::from("X"));
+        #[test]
+        #[should_panic]
+        fn reject_values_less_than_min() {
+            integer_to_roman(MIN_VALUE - 1);
+        }
+
+        #[test]
+        #[should_panic]
+        fn reject_values_greater_than_max() {
+            integer_to_roman(MAX_VALUE + 1);
+        }
+
+        mod simple {
+            use crate::integer_to_roman;
+
+            #[test]
+            fn convert_1_to_i() {
+                assert_eq!(integer_to_roman(1), String::from("I"));
+            }
+
+            #[test]
+            fn convert_5_to_v() {
+                assert_eq!(integer_to_roman(5), String::from("V"));
+            }
+
+            #[test]
+            fn convert_10_to_x() {
+                assert_eq!(integer_to_roman(10), String::from("X"));
+            }
+
+            #[test]
+            fn convert_50_to_l() {
+                assert_eq!(integer_to_roman(50), String::from("L"));
+            }
+
+            #[test]
+            fn convert_100_to_c() {
+                assert_eq!(integer_to_roman(100), String::from("C"));
+            }
+
+            #[test]
+            fn convert_500_to_d() {
+                assert_eq!(integer_to_roman(500), String::from("D"));
+            }
+
+            #[test]
+            fn convert_1000_to_m() {
+                assert_eq!(integer_to_roman(1000), String::from("M"));
+            }
+        }
+
+        mod compound {
+            use crate::integer_to_roman;
+
+            #[test]
+            fn convert_4_to_iv() {
+                assert_eq!(integer_to_roman(4), String::from("IV"));
+            }
+
+            #[test]
+            fn convert_9_to_ix() {
+                assert_eq!(integer_to_roman(9), String::from("IX"));
+            }
+
+            #[test]
+            fn convert_48_to_xlviii() {
+                assert_eq!(integer_to_roman(48), String::from("XLVIII"));
+            }
+
+            #[test]
+            fn convert_701_to_dcci() {
+                assert_eq!(integer_to_roman(701), String::from("DCCI"));
+            }
+
+            #[test]
+            fn convert_1142_to_mcxlii() {
+                assert_eq!(integer_to_roman(1142), String::from("MCXLII"));
+            }
+
+            #[test]
+            fn convert_2468_to_mmcdlxviii() {
+                assert_eq!(integer_to_roman(2468), String::from("MMCDLXVIII"));
+            }
+        }
+    }
+
+    mod rtoi {
+        mod simple {
+            #[test]
+            fn convert_x_to_10() {}
+        }
+
+        mod compound {
+            #[test]
+            fn convert_mcxlii_to_1142() {}
+        }
     }
 
     #[test]
-    fn convert_mcxlii_to_1142() {}
-
-    #[test]
-    fn convert_1142_to_mcxlii() {
-        let roman = integer_to_roman(1142);
-        assert_eq!(roman, String::from("MCXLII"));
-    }
-
-    #[test]
-    #[should_panic]
-    fn reject_values_less_than_min() {
-        integer_to_roman(MIN_VALUE - 1);
-    }
-
-    #[test]
-    #[should_panic]
-    fn reject_values_greater_than_max() {
-        integer_to_roman(MAX_VALUE + 1);
-    }
-
-    #[test]
-    fn check_constants() {
-        // Spot check
+    fn check_atoms() {
         assert_eq!(1000, ATOMS[0].value);
         assert_eq!(40, ATOMS[7].value);
         assert_eq!(1, ATOMS[12].value);
+    }
+
+    #[test]
+    fn check_values_to_symbols() {
         assert_eq!(&"CM", VALUES_TO_SYMBOLS.get(&900).unwrap());
         assert_eq!(&"CD", VALUES_TO_SYMBOLS.get(&400).unwrap());
         assert_eq!(&"C", VALUES_TO_SYMBOLS.get(&100).unwrap());
         assert_eq!(&"IX", VALUES_TO_SYMBOLS.get(&9).unwrap());
+    }
+
+    #[test]
+    fn check_digits() {
         assert_eq!(500, DIGITS[2]);
         assert_eq!(40, DIGITS[7]);
         assert_eq!(5, DIGITS[10]);
