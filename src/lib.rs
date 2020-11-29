@@ -1,18 +1,33 @@
 use std::collections::HashMap;
 use std::iter::FromIterator;
 
-use itertools::unfold;
+use itertools;
+use itertools::Itertools;
 use lazy_static::lazy_static;
 
 pub fn integer_to_roman(val: u32) -> String {
     assert!(val >= MIN_VALUE, "number must be greater than or equal to {}", MIN_VALUE);
     assert!(val <= MAX_VALUE, "number must be less than or equal to {}", MAX_VALUE);
-    String::from("")
+    itertools::unfold(val, digit_extractor)
+        .filter_map(|digit| VALUES_TO_SYMBOLS.get(&digit))
+        .join("")
 }
 
 pub fn roman_to_integer(_numeral: &str) -> Result<u32, RomanNumeralError> {
     Ok(0)
 }
+
+fn digit_extractor(seed: &mut u32) -> Option<u32> {
+    if *seed == 0 {
+        return None;
+    }
+    let next_digit = DIGITS.iter().find(|digit| *seed >= **digit).unwrap_or(&1);
+    *seed = *seed - *next_digit;
+    Some(*next_digit)
+}
+
+pub const MIN_VALUE: u32 = 1;
+pub const MAX_VALUE: u32 = 3999;
 
 #[derive(Debug)]
 struct RomanNumeral {
@@ -20,9 +35,6 @@ struct RomanNumeral {
     symbol: &'static str,
     allow_multiples: bool,
 }
-
-const MIN_VALUE: u32 = 1;
-const MAX_VALUE: u32 = 3999;
 
 lazy_static! {
     static ref ATOMS: [RomanNumeral; 13] = [
@@ -42,13 +54,14 @@ lazy_static! {
     ];
     static ref VALUES_TO_SYMBOLS: HashMap<u32, &'static str> =
         HashMap::from_iter(ATOMS.iter().map(|rn| (rn.value, rn.symbol)));
+    static ref DIGITS: Vec<u32> = ATOMS.iter().map(|rn| rn.value).collect_vec();
 }
 
 pub enum RomanNumeralError {}
 
 #[cfg(test)]
 mod tests {
-    use crate::{integer_to_roman, ATOMS, MAX_VALUE, MIN_VALUE, VALUES_TO_SYMBOLS};
+    use super::{integer_to_roman, ATOMS, DIGITS, MAX_VALUE, MIN_VALUE, VALUES_TO_SYMBOLS};
 
     #[test]
     fn convert_x_to_10() {}
@@ -90,5 +103,8 @@ mod tests {
         assert_eq!(&"CD", VALUES_TO_SYMBOLS.get(&400).unwrap());
         assert_eq!(&"C", VALUES_TO_SYMBOLS.get(&100).unwrap());
         assert_eq!(&"IX", VALUES_TO_SYMBOLS.get(&9).unwrap());
+        assert_eq!(500, DIGITS[2]);
+        assert_eq!(40, DIGITS[7]);
+        assert_eq!(5, DIGITS[10]);
     }
 }
