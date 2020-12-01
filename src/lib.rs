@@ -5,15 +5,20 @@ use itertools;
 use itertools::Itertools;
 use lazy_static::lazy_static;
 
-pub fn integer_to_roman(val: u32) -> String {
-    assert!(val >= MIN_VALUE, "number must be greater than or equal to {}", MIN_VALUE);
-    assert!(val <= MAX_VALUE, "number must be less than or equal to {}", MAX_VALUE);
-    itertools::unfold(val, digit_extractor)
-        .filter_map(|digit| VALUES_TO_SYMBOLS.get(&digit))
-        .join("")
+pub fn integer_to_roman(val: u32) -> Result<String> {
+    if val < MIN_VALUE {
+        Err(RomanNumeralError::too_small(val))
+    } else if val > MAX_VALUE {
+        Err(RomanNumeralError::too_large(val))
+    } else {
+        let result = itertools::unfold(val, digit_extractor)
+            .filter_map(|digit| VALUES_TO_SYMBOLS.get(&digit))
+            .join("");
+        Ok(result)
+    }
 }
 
-pub fn roman_to_integer(_numeral: &str) -> Result<u32, RomanNumeralError> {
+pub fn roman_to_integer(_numeral: &str) -> Result<u32> {
     Ok(0)
 }
 
@@ -25,9 +30,6 @@ fn digit_extractor(seed: &mut u32) -> Option<u32> {
     *seed = *seed - *next_digit;
     Some(*next_digit)
 }
-
-pub const MIN_VALUE: u32 = 1;
-pub const MAX_VALUE: u32 = 3999;
 
 #[derive(Debug)]
 struct RomanNumeral {
@@ -57,7 +59,43 @@ lazy_static! {
     static ref DIGITS: Vec<u32> = ATOMS.iter().map(|rn| rn.value).collect_vec();
 }
 
-pub enum RomanNumeralError {}
+pub const MIN_VALUE: u32 = 1;
+pub const MAX_VALUE: u32 = 3999;
+
+#[derive(Debug, Clone)]
+pub struct RomanNumeralError {
+    kind: RomanNumeralErrorKind,
+}
+
+impl RomanNumeralError {
+    fn too_large(val: u32) -> Self {
+        RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooLarge(val) }
+    }
+
+    fn too_small(val: u32) -> Self {
+        RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooSmall(val) }
+    }
+
+    #[allow(dead_code)]
+    fn unparsable(val: &String) -> Self {
+        RomanNumeralError { kind: RomanNumeralErrorKind::Unparsable(val.clone()) }
+    }
+
+    #[allow(dead_code)]
+    fn empty_string() -> Self {
+        RomanNumeralError { kind: RomanNumeralErrorKind::EmptyString }
+    }
+}
+
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum RomanNumeralErrorKind {
+    ValueTooLarge(u32),
+    ValueTooSmall(u32),
+    Unparsable(String),
+    EmptyString,
+}
+
+type Result<T> = std::result::Result<T, RomanNumeralError>;
 
 #[cfg(test)]
 mod tests {
@@ -69,13 +107,13 @@ mod tests {
         #[test]
         #[should_panic]
         fn reject_values_less_than_min() {
-            integer_to_roman(MIN_VALUE - 1);
+            integer_to_roman(MIN_VALUE - 1).unwrap();
         }
 
         #[test]
         #[should_panic]
         fn reject_values_greater_than_max() {
-            integer_to_roman(MAX_VALUE + 1);
+            integer_to_roman(MAX_VALUE + 1).unwrap();
         }
 
         mod simple {
@@ -83,37 +121,37 @@ mod tests {
 
             #[test]
             fn convert_1_to_i() {
-                assert_eq!(integer_to_roman(1), String::from("I"));
+                assert_eq!(integer_to_roman(1).unwrap(), String::from("I"));
             }
 
             #[test]
             fn convert_5_to_v() {
-                assert_eq!(integer_to_roman(5), String::from("V"));
+                assert_eq!(integer_to_roman(5).unwrap(), String::from("V"));
             }
 
             #[test]
             fn convert_10_to_x() {
-                assert_eq!(integer_to_roman(10), String::from("X"));
+                assert_eq!(integer_to_roman(10).unwrap(), String::from("X"));
             }
 
             #[test]
             fn convert_50_to_l() {
-                assert_eq!(integer_to_roman(50), String::from("L"));
+                assert_eq!(integer_to_roman(50).unwrap(), String::from("L"));
             }
 
             #[test]
             fn convert_100_to_c() {
-                assert_eq!(integer_to_roman(100), String::from("C"));
+                assert_eq!(integer_to_roman(100).unwrap(), String::from("C"));
             }
 
             #[test]
             fn convert_500_to_d() {
-                assert_eq!(integer_to_roman(500), String::from("D"));
+                assert_eq!(integer_to_roman(500).unwrap(), String::from("D"));
             }
 
             #[test]
             fn convert_1000_to_m() {
-                assert_eq!(integer_to_roman(1000), String::from("M"));
+                assert_eq!(integer_to_roman(1000).unwrap(), String::from("M"));
             }
         }
 
@@ -122,32 +160,32 @@ mod tests {
 
             #[test]
             fn convert_4_to_iv() {
-                assert_eq!(integer_to_roman(4), String::from("IV"));
+                assert_eq!(integer_to_roman(4).unwrap(), String::from("IV"));
             }
 
             #[test]
             fn convert_9_to_ix() {
-                assert_eq!(integer_to_roman(9), String::from("IX"));
+                assert_eq!(integer_to_roman(9).unwrap(), String::from("IX"));
             }
 
             #[test]
             fn convert_48_to_xlviii() {
-                assert_eq!(integer_to_roman(48), String::from("XLVIII"));
+                assert_eq!(integer_to_roman(48).unwrap(), String::from("XLVIII"));
             }
 
             #[test]
             fn convert_701_to_dcci() {
-                assert_eq!(integer_to_roman(701), String::from("DCCI"));
+                assert_eq!(integer_to_roman(701).unwrap(), String::from("DCCI"));
             }
 
             #[test]
             fn convert_1142_to_mcxlii() {
-                assert_eq!(integer_to_roman(1142), String::from("MCXLII"));
+                assert_eq!(integer_to_roman(1142).unwrap(), String::from("MCXLII"));
             }
 
             #[test]
             fn convert_2468_to_mmcdlxviii() {
-                assert_eq!(integer_to_roman(2468), String::from("MMCDLXVIII"));
+                assert_eq!(integer_to_roman(2468).unwrap(), String::from("MMCDLXVIII"));
             }
         }
     }
