@@ -30,8 +30,8 @@ impl RomanNumeralError {
     }
 
     #[allow(dead_code)]
-    fn unparsable(val: &String) -> Self {
-        RomanNumeralError { kind: RomanNumeralErrorKind::Unparsable(val.clone()) }
+    fn unparsable(val: &str) -> Self {
+        RomanNumeralError { kind: RomanNumeralErrorKind::Unparsable(String::from(val)) }
     }
 
     #[allow(dead_code)]
@@ -42,7 +42,7 @@ impl RomanNumeralError {
 
 pub type Result<T> = std::result::Result<T, RomanNumeralError>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct RomanNumeral {
     value: u32,
     symbol: &'static str,
