@@ -37,8 +37,9 @@ lazy_static! {
 
 #[cfg(test)]
 mod tests {
-    use super::{integer_to_roman, DIGITS, VALUES_TO_SYMBOLS};
-    use super::{MAX_VALUE, MIN_VALUE};
+    use crate::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind, MAX_VALUE, MIN_VALUE};
+
+    use super::{DIGITS, VALUES_TO_SYMBOLS};
 
     #[test]
     fn check_digits() {
@@ -56,15 +57,21 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn reject_values_less_than_min() {
-        integer_to_roman(MIN_VALUE - 1).unwrap();
+        match integer_to_roman(MIN_VALUE - 1) {
+            Err(RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooSmall(_) }) => (),
+            Err(RomanNumeralError { kind: _ }) => panic!("wrong kind of error"),
+            Ok(_) => panic!("unexpected ok result"),
+        };
     }
 
     #[test]
-    #[should_panic]
     fn reject_values_greater_than_max() {
-        integer_to_roman(MAX_VALUE + 1).unwrap();
+        match integer_to_roman(MAX_VALUE + 1) {
+            Err(RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooLarge(_) }) => (),
+            Err(RomanNumeralError { kind: _ }) => panic!("wrong kind of error"),
+            Ok(_) => panic!("unexpected ok result"),
+        };
     }
 
     mod simple {
