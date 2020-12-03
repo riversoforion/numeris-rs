@@ -23,11 +23,10 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// ### Invalid characters
 /// ```
-/// use romanus::{roman_to_integer, RomanNumeralError, RomanNumeralErrorKind};
+/// use romanus::{roman_to_integer, RomanNumeralError};
 ///
 /// match roman_to_integer("BAD") {
-///     Err(RomanNumeralError {kind: RomanNumeralErrorKind::Unparsable(_)}) => println!("BAD
-/// input"),
+///     Err(RomanNumeralError::Unparsable(_)) => println!("BAD input"),
 ///     Err(_) => panic!("wrong kind of BAD"),
 ///     Ok(_) => panic!("BAD is not good"),
 /// };
@@ -35,10 +34,10 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// ### Empty input
 /// ```
-/// use romanus::{roman_to_integer, RomanNumeralError, RomanNumeralErrorKind};
+/// use romanus::{roman_to_integer, RomanNumeralError};
 ///
 /// match roman_to_integer("    ") {
-///     Err(RomanNumeralError {kind: RomanNumeralErrorKind::EmptyString}) => println!("no input"),
+///     Err(RomanNumeralError::EmptyString) => println!("no input"),
 ///     Err(_) => panic!("hmm"),
 ///     Ok(_) => panic!("unacceptable"),
 /// };
@@ -46,13 +45,13 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// # Errors
 ///
-/// | `RomanNumeralErrorKind` | Reason |
+/// | `RomanNumeralError` | Reason |
 /// | ----------------------- | ------ |
 /// | [`Unparsable`][a] | `numeral` cannot be parsed as a Roman numeral |
 /// | [`EmptyString`][b] |  `numeral` is an empty string or contains only whitespace |
 ///
-/// [a]: crate::RomanNumeralErrorKind::Unparsable
-/// [b]: crate::RomanNumeralErrorKind::EmptyString
+/// [a]: crate::RomanNumeralError::Unparsable
+/// [b]: crate::RomanNumeralError::EmptyString
 pub fn roman_to_integer(numeral: &str) -> Result<u32> {
     let numeral = normalize_numeral(&numeral);
     let numeral = check_numeral_format(&numeral)?;
@@ -70,9 +69,9 @@ fn check_numeral_format(numeral: &String) -> Result<&String> {
         static ref RE: Regex = Regex::new(r"^[IVXLCDM]+$").unwrap();
     }
     if numeral.len() == 0 {
-        Err(RomanNumeralError::empty_string())
+        Err(RomanNumeralError::EmptyString)
     } else if !RE.is_match(numeral) {
-        Err(RomanNumeralError::unparsable(numeral))
+        Err(RomanNumeralError::Unparsable(numeral.clone()))
     } else {
         Ok(numeral)
     }
@@ -94,7 +93,7 @@ fn decompose_numeral(numeral: &str) -> Result<Vec<u32>> {
         }
     }
     if parse_state.remaining_to_parse.len() > 0 {
-        Err(RomanNumeralError::unparsable(numeral))
+        Err(RomanNumeralError::Unparsable(String::from(numeral)))
     } else {
         Ok(result)
     }
@@ -133,13 +132,13 @@ impl<'a> ParseState<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{roman_to_integer, RomanNumeralError, RomanNumeralErrorKind};
+    use crate::{roman_to_integer, RomanNumeralError};
 
     #[test]
     fn reject_invalid_format() {
         for val in ["ABCDEF", "MMDL1", "934;-)", "CMM", "ID", "MMCCD", "XLXL"].iter() {
             match roman_to_integer(*val) {
-                Err(RomanNumeralError { kind: RomanNumeralErrorKind::Unparsable(_) }) => (),
+                Err(RomanNumeralError::Unparsable(_)) => (),
                 Err(_) => panic!("wrong kind of error"),
                 Ok(_) => panic!("unexpected ok result"),
             }
@@ -150,7 +149,7 @@ mod tests {
     fn reject_empty_string() {
         for val in ["", "   ", "\t", "\n"].iter() {
             match roman_to_integer(*val) {
-                Err(RomanNumeralError { kind: RomanNumeralErrorKind::EmptyString }) => (),
+                Err(RomanNumeralError::EmptyString) => (),
                 Err(_) => panic!("wrong kind of error"),
                 Ok(_) => panic!("unexpected ok result"),
             }

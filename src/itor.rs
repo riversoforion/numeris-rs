@@ -24,10 +24,10 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 ///
 /// ### Value too small
 /// ```
-/// use romanus::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind};
+/// use romanus::{integer_to_roman, RomanNumeralError};
 ///
 /// match integer_to_roman(0) {
-///     Err(RomanNumeralError{ kind: RomanNumeralErrorKind::ValueTooSmall(_)}) => (),
+///     Err(RomanNumeralError::ValueTooSmall(_)) => (),
 ///     Err(_) => panic!("not enough Roman"),
 ///     Ok(_) => panic!("0's not good"),
 /// }
@@ -35,10 +35,10 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 ///
 /// ### Value too large
 /// ```
-/// use romanus::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind};
+/// use romanus::{integer_to_roman, RomanNumeralError};
 ///
 /// match integer_to_roman(6000) {
-///     Err(RomanNumeralError{ kind: RomanNumeralErrorKind::ValueTooLarge(_)}) => (),
+///     Err(RomanNumeralError::ValueTooLarge(_)) => (),
 ///     Err(_) => panic!("too much Roman"),
 ///     Ok(_) => panic!("0's not good"),
 /// }
@@ -51,13 +51,13 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 /// | [`ValueTooSmall`][a] | `val` is too small to be converted to a Roman numeral |
 /// | [`ValueTooLarge`][b] |  `val` is too large to be converted to a Roman numeral |
 ///
-/// [a]: crate::RomanNumeralErrorKind::ValueTooSmall
-/// [b]: crate::RomanNumeralErrorKind::ValueTooLarge
+/// [a]: crate::RomanNumeralError::ValueTooSmall
+/// [b]: crate::RomanNumeralError::ValueTooLarge
 pub fn integer_to_roman(val: u32) -> Result<String> {
     if val < MIN_VALUE {
-        Err(RomanNumeralError::too_small(val))
+        Err(RomanNumeralError::ValueTooSmall(val))
     } else if val > MAX_VALUE {
-        Err(RomanNumeralError::too_large(val))
+        Err(RomanNumeralError::ValueTooLarge(val))
     } else {
         let result = itertools::unfold(val, digit_extractor)
             .filter_map(|digit| VALUES_TO_SYMBOLS.get(&digit))
@@ -83,7 +83,7 @@ lazy_static! {
 
 #[cfg(test)]
 mod tests {
-    use crate::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind, MAX_VALUE, MIN_VALUE};
+    use crate::{integer_to_roman, RomanNumeralError, MAX_VALUE, MIN_VALUE};
 
     use super::{DIGITS, VALUES_TO_SYMBOLS};
 
@@ -105,8 +105,8 @@ mod tests {
     #[test]
     fn reject_values_less_than_min() {
         match integer_to_roman(MIN_VALUE - 1) {
-            Err(RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooSmall(_) }) => (),
-            Err(RomanNumeralError { kind: _ }) => panic!("wrong kind of error"),
+            Err(RomanNumeralError::ValueTooSmall(_)) => (),
+            Err(_) => panic!("wrong kind of error"),
             Ok(_) => panic!("unexpected ok result"),
         };
     }
@@ -114,8 +114,8 @@ mod tests {
     #[test]
     fn reject_values_greater_than_max() {
         match integer_to_roman(MAX_VALUE + 1) {
-            Err(RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooLarge(_) }) => (),
-            Err(RomanNumeralError { kind: _ }) => panic!("wrong kind of error"),
+            Err(RomanNumeralError::ValueTooLarge(_)) => (),
+            Err(_) => panic!("wrong kind of error"),
             Ok(_) => panic!("unexpected ok result"),
         };
     }

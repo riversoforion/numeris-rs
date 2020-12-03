@@ -19,7 +19,7 @@ pub const MAX_VALUE: u32 = 3999;
 
 /// The different kinds of errors that can be encountered when working with Roman numerals.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum RomanNumeralErrorKind {
+pub enum RomanNumeralError {
     /// Indicates that the numeric value is too large to be turned into a Roman numeral.
     ValueTooLarge(u32),
     /// Indicates that the numeric value is too small to be turned into a Roman numeral.
@@ -28,32 +28,6 @@ pub enum RomanNumeralErrorKind {
     Unparsable(String),
     /// Indicates an empty Roman numeral value.
     EmptyString,
-}
-
-/// Indicates some error was encountered converting to or from a Roman numeral.
-#[derive(Debug, Clone)]
-pub struct RomanNumeralError {
-    pub kind: RomanNumeralErrorKind,
-}
-
-impl RomanNumeralError {
-    fn too_large(val: u32) -> Self {
-        RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooLarge(val) }
-    }
-
-    fn too_small(val: u32) -> Self {
-        RomanNumeralError { kind: RomanNumeralErrorKind::ValueTooSmall(val) }
-    }
-
-    #[allow(dead_code)]
-    fn unparsable(val: &str) -> Self {
-        RomanNumeralError { kind: RomanNumeralErrorKind::Unparsable(String::from(val)) }
-    }
-
-    #[allow(dead_code)]
-    fn empty_string() -> Self {
-        RomanNumeralError { kind: RomanNumeralErrorKind::EmptyString }
-    }
 }
 
 pub type Result<T> = std::result::Result<T, RomanNumeralError>;
