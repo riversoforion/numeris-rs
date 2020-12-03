@@ -1,6 +1,10 @@
 //! # Romanus
 //!
 //! A simple crate for working with Roman numerals.
+//!
+//! The entry points are two functions, [`integer_to_roman`] and [`roman_to_integer`], which
+//! convert between integral values and string-representations of Roman numerals. See the
+//! documentation on each function for details.
 
 pub use itor::integer_to_roman;
 pub use rtoi::roman_to_integer;

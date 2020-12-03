@@ -7,6 +7,52 @@ use lazy_static::lazy_static;
 
 use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 
+/// Converts an integer into a string representing a Roman Numeral.
+///
+/// The input must be greater than or equal to [`MIN_VALUE`] and less than or equal to
+/// [`MAX_VALUE`]. The Roman numeral will be returned in upper-case characters.
+///
+/// # Examples
+///
+/// ### Normal usage
+/// ```
+/// use romanus::integer_to_roman;
+///
+/// let rn = integer_to_roman(1142).unwrap();
+/// assert_eq!(rn, "MCXLII");
+/// ```
+///
+/// ### Value too small
+/// ```
+/// use romanus::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind};
+///
+/// match integer_to_roman(0) {
+///     Err(RomanNumeralError{ kind: RomanNumeralErrorKind::ValueTooSmall(_)}) => (),
+///     Err(_) => panic!("not enough Roman"),
+///     Ok(_) => panic!("0's not good"),
+/// }
+/// ```
+///
+/// ### Value too large
+/// ```
+/// use romanus::{integer_to_roman, RomanNumeralError, RomanNumeralErrorKind};
+///
+/// match integer_to_roman(6000) {
+///     Err(RomanNumeralError{ kind: RomanNumeralErrorKind::ValueTooLarge(_)}) => (),
+///     Err(_) => panic!("too much Roman"),
+///     Ok(_) => panic!("0's not good"),
+/// }
+/// ```
+///
+/// # Errors
+///
+/// | `RomanNumeralErrorKind` | Reason |
+/// | ----------------------- | ------ |
+/// | [`ValueTooSmall`][a] | `val` is too small to be converted to a Roman numeral |
+/// | [`ValueTooLarge`][b] |  `val` is too large to be converted to a Roman numeral |
+///
+/// [a]: crate::RomanNumeralErrorKind::ValueTooSmall
+/// [b]: crate::RomanNumeralErrorKind::ValueTooLarge
 pub fn integer_to_roman(val: u32) -> Result<String> {
     if val < MIN_VALUE {
         Err(RomanNumeralError::too_small(val))
