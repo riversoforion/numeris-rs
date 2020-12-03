@@ -4,6 +4,55 @@ use regex::Regex;
 
 use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 
+/// Converts a string representing a Roman numeral into an integer.
+///
+/// The input must be a valid Roman numeral. Both upper- & lower-case values are supported, and
+/// any leading and trailing whitespace will be trimmed before parsing.
+///
+/// # Examples
+///
+/// ### Normal usage
+/// ```
+/// use romanus::roman_to_integer;
+///
+/// let i = roman_to_integer("MCXLII").unwrap();
+/// assert_eq!(i, 1142);
+/// let i = roman_to_integer(" cv\n").unwrap();
+/// assert_eq!(i, 105);
+/// ```
+///
+/// ### Invalid characters
+/// ```
+/// use romanus::{roman_to_integer, RomanNumeralError, RomanNumeralErrorKind};
+///
+/// match roman_to_integer("BAD") {
+///     Err(RomanNumeralError {kind: RomanNumeralErrorKind::Unparsable(_)}) => println!("BAD
+/// input"),
+///     Err(_) => panic!("wrong kind of BAD"),
+///     Ok(_) => panic!("BAD is not good"),
+/// };
+/// ```
+///
+/// ### Empty input
+/// ```
+/// use romanus::{roman_to_integer, RomanNumeralError, RomanNumeralErrorKind};
+///
+/// match roman_to_integer("    ") {
+///     Err(RomanNumeralError {kind: RomanNumeralErrorKind::EmptyString}) => println!("no input"),
+///     Err(_) => panic!("hmm"),
+///     Ok(_) => panic!("unacceptable"),
+/// };
+/// ```
+///
+/// # Errors
+///
+/// | `RomanNumeralErrorKind` | Reason |
+/// | ----------------------- | ------ |
+/// | [`Unparsable`][a] | `numeral` cannot be parsed as a Roman numeral |
+/// | [`EmptyString`][b] |  `numeral` is an empty string or contains only whitespace |
+///
+/// [a]: crate::RomanNumeralErrorKind::Unparsable
+/// [b]: crate::RomanNumeralErrorKind::EmptyString
 pub fn roman_to_integer(numeral: &str) -> Result<u32> {
     let numeral = normalize_numeral(&numeral);
     let numeral = check_numeral_format(&numeral)?;

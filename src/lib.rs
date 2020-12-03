@@ -1,23 +1,35 @@
+//! # Romanus
+//!
+//! A simple crate for working with Roman numerals.
+
 pub use itor::integer_to_roman;
 pub use rtoi::roman_to_integer;
 
 mod itor;
 mod rtoi;
 
+/// The minimum value supported for Roman numerals
 pub const MIN_VALUE: u32 = 1;
+/// The maximum value supported for Roman numerals
 pub const MAX_VALUE: u32 = 3999;
 
+/// The different kinds of errors that can be encountered when working with Roman numerals.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum RomanNumeralErrorKind {
+    /// Indicates that the numeric value is too large to be turned into a Roman numeral.
     ValueTooLarge(u32),
+    /// Indicates that the numeric value is too small to be turned into a Roman numeral.
     ValueTooSmall(u32),
+    /// Indicates a Roman numeral that could not be parsed into an integer.
     Unparsable(String),
+    /// Indicates an empty Roman numeral value.
     EmptyString,
 }
 
+/// Indicates some error was encountered converting to or from a Roman numeral.
 #[derive(Debug, Clone)]
 pub struct RomanNumeralError {
-    kind: RomanNumeralErrorKind,
+    pub kind: RomanNumeralErrorKind,
 }
 
 impl RomanNumeralError {
