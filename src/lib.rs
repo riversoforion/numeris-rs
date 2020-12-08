@@ -55,6 +55,8 @@ const ATOMS: [RomanNumeral; 13] = [
     RomanNumeral { value: 1, symbol: "I", allow_multiples: true },
 ];
 
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 #[cfg(test)]
 mod tests {
     use super::ATOMS;

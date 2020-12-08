@@ -1,12 +1,14 @@
 [package]
 name = "romanus"
-version = "0.2.0"
+description = "Simple library for converting between integers and Roman numerals"
+version = "0.3.0"
 authors = ["Eric McIntyre <mac@riversoforion.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+keywords = ["roman_numerals", "conversion"]
+categories = ["command-line-utilities", "value-formatting"]
 
 [dependencies]
-itertools = "0.9"
-lazy_static = "1.4"
-regex = "1.4"
+clap = "~2.33.0"
+itertools = "~0.9.0"
+lazy_static = "~1.4.0"
+regex = "~1.4.0"
