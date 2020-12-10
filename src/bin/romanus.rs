@@ -1,6 +1,7 @@
 use std::io;
 use std::io::Write;
 
+use ansi_term::{Colour::Cyan, Colour::Green, Colour::Red, Style};
 use clap::{
     clap_app, crate_authors, crate_description, crate_name, crate_version, value_t, ArgMatches,
 };
@@ -14,13 +15,13 @@ fn main() {
     if args.is_present("integer") {
         let i = value_t!(args.value_of("integer"), u32).unwrap_or_else(|e| e.exit());
         if debug {
-            println!("integer = {}", i);
+            print_debug(String::from("integer"), i.to_string());
         }
         print_roman_numeral(i, bare, &mut io::stdout(), &mut io::stderr());
     } else {
         let rn = args.value_of("roman").unwrap();
         if debug {
-            println!("roman = {}", rn);
+            print_debug(String::from("roman"), String::from(rn))
         }
         print_integer(rn, bare, &mut io::stdout(), &mut io::stderr());
     }
@@ -28,14 +29,14 @@ fn main() {
 
 fn print_roman_numeral(val: u32, bare: bool, mut out: impl Write, mut err: impl Write) {
     match integer_to_roman(val) {
-        Ok(rn) => writeln!(out, "{}{}", result_prefix(bare), rn),
+        Ok(rn) => writeln!(out, "{}{}", result_prefix(bare), Green.paint(rn)),
         Err(e) => {
             let msg = match e {
                 RomanNumeralError::ValueTooLarge(n) => format!("{} is too large", n),
                 RomanNumeralError::ValueTooSmall(n) => format!("{} is too small", n),
                 _ => String::from("Well, this is awkward"),
             };
-            writeln!(err, "{}{}", error_prefix(bare), msg)
+            writeln!(err, "{}{}", error_prefix(bare), Red.paint(msg))
         }
     }
     .unwrap();
@@ -43,14 +44,14 @@ fn print_roman_numeral(val: u32, bare: bool, mut out: impl Write, mut err: impl 
 
 fn print_integer(val: &str, bare: bool, mut out: impl Write, mut err: impl Write) {
     match roman_to_integer(val) {
-        Ok(i) => writeln!(out, "{}{}", result_prefix(bare), i),
+        Ok(i) => writeln!(out, "{}{}", result_prefix(bare), Green.paint(i.to_string())),
         Err(e) => {
             let msg = match e {
                 RomanNumeralError::Unparsable(v) => format!("{} is not a valid Roman numeral", v),
                 RomanNumeralError::EmptyString => format!("No Roman numeral provided"),
                 _ => String::from("Well, this is awkward"),
             };
-            writeln!(err, "{}{}", error_prefix(bare), msg)
+            writeln!(err, "{}{}", error_prefix(bare), Red.paint(msg))
         }
     }
     .unwrap();
@@ -76,7 +77,7 @@ fn result_prefix(bare: bool) -> String {
     if bare {
         String::from("")
     } else {
-        String::from("RESULT: ")
+        format!("{} ", Green.bold().reverse().paint("RESULT:"))
     }
 }
 
@@ -84,24 +85,37 @@ fn error_prefix(bare: bool) -> String {
     if bare {
         String::from("")
     } else {
-        String::from("ERROR: ")
+        format!("{} ", Red.bold().reverse().paint("ERROR:"))
     }
+}
+
+fn print_debug(prefix: String, val: String) {
+    let dim = Style::new().dimmed();
+    let cyan = Cyan.dimmed();
+    let prefix = format!("{} = ", prefix);
+    println!("{}{}", dim.paint(prefix), cyan.paint(val.to_string()));
 }
 
 #[cfg(test)]
 mod tests {
+    use ansi_term::{Colour::Green, Colour::Red};
+
     use crate::{error_prefix, print_integer, print_roman_numeral, result_prefix};
 
     #[test]
     fn result_prefix_is_correct() {
-        assert_eq!(result_prefix(false), String::from("RESULT: "));
-        assert_eq!(result_prefix(true), String::from(""));
+        let expected = format!("{} ", Green.bold().reverse().paint("RESULT:"));
+        assert_eq!(result_prefix(false), expected);
+        let expected = String::from("");
+        assert_eq!(result_prefix(true), expected);
     }
 
     #[test]
     fn error_prefix_is_correct() {
-        assert_eq!(error_prefix(false), String::from("ERROR: "));
-        assert_eq!(error_prefix(true), String::from(""));
+        let expected = format!("{} ", Red.bold().reverse().paint("ERROR:"));
+        assert_eq!(error_prefix(false), expected);
+        let expected = String::from("");
+        assert_eq!(error_prefix(true), expected);
     }
 
     #[test]
@@ -110,7 +124,9 @@ mod tests {
         let mut err = Vec::new();
         print_roman_numeral(1, false, &mut out, &mut err);
         assert_eq!(err.len(), 0);
-        assert_eq!(out, b"RESULT: I\n");
+        let expected =
+            format!("{} {}\n", Green.bold().reverse().paint("RESULT:"), Green.paint("I"));
+        assert_eq!(out, expected.as_bytes());
     }
 
     #[test]
@@ -119,7 +135,8 @@ mod tests {
         let mut err = Vec::new();
         print_roman_numeral(1, true, &mut out, &mut err);
         assert_eq!(err.len(), 0);
-        assert_eq!(out, b"I\n");
+        let expected = format!("{}\n", Green.paint("I"));
+        assert_eq!(out, expected.as_bytes());
     }
 
     #[test]
@@ -128,7 +145,9 @@ mod tests {
         let mut err = Vec::new();
         print_roman_numeral(0, false, &mut out, &mut err);
         assert_eq!(out.len(), 0);
-        assert_eq!(err, b"ERROR: 0 is too small\n");
+        let expected =
+            format!("{} {}\n", Red.bold().reverse().paint("ERROR:"), Red.paint("0 is too small"));
+        assert_eq!(err, expected.as_bytes());
     }
 
     #[test]
@@ -137,7 +156,8 @@ mod tests {
         let mut err = Vec::new();
         print_roman_numeral(0, true, &mut out, &mut err);
         assert_eq!(out.len(), 0);
-        assert_eq!(err, b"0 is too small\n");
+        let expected = format!("{}\n", Red.paint("0 is too small"));
+        assert_eq!(err, expected.as_bytes());
     }
 
     #[test]
@@ -146,7 +166,9 @@ mod tests {
         let mut err = Vec::new();
         print_integer("XI", false, &mut out, &mut err);
         assert_eq!(err.len(), 0);
-        assert_eq!(out, b"RESULT: 11\n");
+        let expected =
+            format!("{} {}\n", Green.bold().reverse().paint("RESULT:"), Green.paint("11"));
+        assert_eq!(out, expected.as_bytes());
     }
 
     #[test]
@@ -155,7 +177,8 @@ mod tests {
         let mut err = Vec::new();
         print_integer("XI", true, &mut out, &mut err);
         assert_eq!(err.len(), 0);
-        assert_eq!(out, b"11\n");
+        let expected = format!("{}\n", Green.paint("11"));
+        assert_eq!(out, expected.as_bytes());
     }
 
     #[test]
@@ -164,7 +187,12 @@ mod tests {
         let mut err = Vec::new();
         print_integer("Blah", false, &mut out, &mut err);
         assert_eq!(out.len(), 0);
-        assert_eq!(err, b"ERROR: BLAH is not a valid Roman numeral\n");
+        let expected = format!(
+            "{} {}\n",
+            Red.bold().reverse().paint("ERROR:"),
+            Red.paint("BLAH is not a valid Roman numeral")
+        );
+        assert_eq!(err, expected.as_bytes());
     }
 
     #[test]
@@ -173,6 +201,7 @@ mod tests {
         let mut err = Vec::new();
         print_integer("Blah", true, &mut out, &mut err);
         assert_eq!(out.len(), 0);
-        assert_eq!(err, b"BLAH is not a valid Roman numeral\n");
+        let expected = format!("{}\n", Red.paint("BLAH is not a valid Roman numeral"));
+        assert_eq!(err, expected.as_bytes());
     }
 }
