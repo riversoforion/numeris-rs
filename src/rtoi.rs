@@ -13,7 +13,7 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// ### Normal usage
 /// ```
-/// use romanus::roman_to_integer;
+/// use numeris::roman_to_integer;
 ///
 /// let i = roman_to_integer("MCXLII").unwrap();
 /// assert_eq!(i, 1142);
@@ -23,7 +23,7 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// ### Invalid characters
 /// ```
-/// use romanus::{roman_to_integer, RomanNumeralError};
+/// use numeris::{roman_to_integer, RomanNumeralError};
 ///
 /// match roman_to_integer("BAD") {
 ///     Err(RomanNumeralError::Unparsable(_)) => println!("BAD input"),
@@ -34,7 +34,7 @@ use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
 ///
 /// ### Empty input
 /// ```
-/// use romanus::{roman_to_integer, RomanNumeralError};
+/// use numeris::{roman_to_integer, RomanNumeralError};
 ///
 /// match roman_to_integer("    ") {
 ///     Err(RomanNumeralError::EmptyString) => println!("no input"),

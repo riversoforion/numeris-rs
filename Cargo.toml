@@ -1,5 +1,5 @@
 [package]
-name = "romanus"
+name = "numeris"
 description = "Simple library for converting between integers and Roman numerals"
 version = "0.3.0"
 authors = ["Eric McIntyre <mac@riversoforion.com>"]

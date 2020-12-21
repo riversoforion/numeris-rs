@@ -6,7 +6,7 @@ use clap::{
     clap_app, crate_authors, crate_description, crate_name, crate_version, value_t, ArgMatches,
 };
 
-use romanus::{integer_to_roman, roman_to_integer, RomanNumeralError};
+use numeris::{integer_to_roman, roman_to_integer, RomanNumeralError};
 
 fn main() {
     let args = app_args();
@@ -58,7 +58,7 @@ fn print_integer(val: &str, bare: bool, mut out: impl Write, mut err: impl Write
 }
 
 fn app_args() -> ArgMatches<'static> {
-    clap_app!(romanus =>
+    clap_app!(numeris =>
         (@group conversion +required =>
             (@arg integer: -i --integer [NUMBER] "Convert the given integer value to a roman numeral")
             (@arg roman: -r --roman [NUMERAL] "Convert the given roman numeral to an integer value")

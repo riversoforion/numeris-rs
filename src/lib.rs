@@ -1,4 +1,4 @@
-//! # Romanus
+//! # Numeris
 //!
 //! A simple crate for working with Roman numerals.
 //!

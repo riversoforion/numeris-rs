@@ -1,2 +1,6 @@
 target/
 *.profraw
+
+# JetBrains IDEs
+.idea/
+*.iml

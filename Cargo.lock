@@ -102,6 +102,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ee1c47aaa256ecabcaea351eae4a9b01ef39ed810004e298d2511ed284b1525"
 
 [[package]]
+name = "numeris"
+version = "0.3.0"
+dependencies = [
+ "ansi_term 0.12.1",
+ "clap",
+ "itertools",
+ "lazy_static",
+ "regex",
+]
+
+[[package]]
 name = "regex"
 version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -118,17 +129,6 @@ name = "regex-syntax"
 version = "0.6.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b181ba2dcf07aaccad5448e8ead58db5b742cf85dfe035e2227f137a539a189"
-
-[[package]]
-name = "romanus"
-version = "0.3.0"
-dependencies = [
- "ansi_term 0.12.1",
- "clap",
- "itertools",
- "lazy_static",
- "regex",
-]
 
 [[package]]
 name = "strsim"

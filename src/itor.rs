@@ -16,7 +16,7 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 ///
 /// ### Normal usage
 /// ```
-/// use romanus::integer_to_roman;
+/// use numeris::integer_to_roman;
 ///
 /// let rn = integer_to_roman(1142).unwrap();
 /// assert_eq!(rn, "MCXLII");
@@ -24,7 +24,7 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 ///
 /// ### Value too small
 /// ```
-/// use romanus::{integer_to_roman, RomanNumeralError};
+/// use numeris::{integer_to_roman, RomanNumeralError};
 ///
 /// match integer_to_roman(0) {
 ///     Err(RomanNumeralError::ValueTooSmall(_)) => (),
@@ -35,7 +35,7 @@ use super::{Result, RomanNumeralError, ATOMS, MAX_VALUE, MIN_VALUE};
 ///
 /// ### Value too large
 /// ```
-/// use romanus::{integer_to_roman, RomanNumeralError};
+/// use numeris::{integer_to_roman, RomanNumeralError};
 ///
 /// match integer_to_roman(6000) {
 ///     Err(RomanNumeralError::ValueTooLarge(_)) => (),

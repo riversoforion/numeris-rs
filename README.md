@@ -1,8 +1,8 @@
-# Romanus: Rust implementation
+# Numeris: Rust implementation
 
 *TODO: CI, Cargo, Docs.rs links*
 
-The Rust implementation of Romanus features a library and CLI.
+The Rust implementation of Numeris features a library and CLI.
 
 ## Library Usage
 
@@ -14,6 +14,6 @@ The Rust implementation of Romanus features a library and CLI.
 
 ## Development
 
-Romanus is a simple Rust package, built on Rust's standard tooling and
+Numeris is a simple Rust package, built on Rust's standard tooling and
 ecosystem. It should be relatively easy for even a novice Rust developer (like
 me!) to understand and modify.
