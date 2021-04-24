@@ -36,23 +36,23 @@ pub type Result<T> = std::result::Result<T, RomanNumeralError>;
 struct RomanNumeral {
     value: u32,
     symbol: &'static str,
-    allow_multiples: bool,
+    max_group: u8,
 }
 
 const ATOMS: [RomanNumeral; 13] = [
-    RomanNumeral { value: 1000, symbol: "M", allow_multiples: true },
-    RomanNumeral { value: 900, symbol: "CM", allow_multiples: false },
-    RomanNumeral { value: 500, symbol: "D", allow_multiples: true },
-    RomanNumeral { value: 400, symbol: "CD", allow_multiples: false },
-    RomanNumeral { value: 100, symbol: "C", allow_multiples: true },
-    RomanNumeral { value: 90, symbol: "XC", allow_multiples: false },
-    RomanNumeral { value: 50, symbol: "L", allow_multiples: true },
-    RomanNumeral { value: 40, symbol: "XL", allow_multiples: false },
-    RomanNumeral { value: 10, symbol: "X", allow_multiples: true },
-    RomanNumeral { value: 9, symbol: "IX", allow_multiples: false },
-    RomanNumeral { value: 5, symbol: "V", allow_multiples: true },
-    RomanNumeral { value: 4, symbol: "IV", allow_multiples: false },
-    RomanNumeral { value: 1, symbol: "I", allow_multiples: true },
+    RomanNumeral { value: 1000, symbol: "M", max_group: 3 },
+    RomanNumeral { value: 900, symbol: "CM", max_group: 1 },
+    RomanNumeral { value: 500, symbol: "D", max_group: 1 },
+    RomanNumeral { value: 400, symbol: "CD", max_group: 1 },
+    RomanNumeral { value: 100, symbol: "C", max_group: 3 },
+    RomanNumeral { value: 90, symbol: "XC", max_group: 1 },
+    RomanNumeral { value: 50, symbol: "L", max_group: 1 },
+    RomanNumeral { value: 40, symbol: "XL", max_group: 1 },
+    RomanNumeral { value: 10, symbol: "X", max_group: 3 },
+    RomanNumeral { value: 9, symbol: "IX", max_group: 1 },
+    RomanNumeral { value: 5, symbol: "V", max_group: 1 },
+    RomanNumeral { value: 4, symbol: "IV", max_group: 1 },
+    RomanNumeral { value: 1, symbol: "I", max_group: 3 },
 ];
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");

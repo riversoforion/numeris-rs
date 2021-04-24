@@ -2,7 +2,7 @@ use itertools::fold;
 use lazy_static::lazy_static;
 use regex::Regex;
 
-use super::{Result, RomanNumeral, RomanNumeralError, ATOMS};
+use super::{ATOMS, Result, RomanNumeral, RomanNumeralError};
 
 /// Converts a string representing a Roman numeral into an integer.
 ///
@@ -81,11 +81,10 @@ fn decompose_numeral(numeral: &str) -> Result<Vec<u32>> {
     let mut parse_state = ParseState::new(numeral);
     let mut result: Vec<u32> = Vec::new();
     while !parse_state.is_complete() {
-        let current = parse_state.current_numeral();
-        if parse_state.remaining_to_parse.starts_with(current.symbol) {
-            result.push(current.value);
+        if parse_state.remaining_to_parse.starts_with(parse_state.current_numeral().symbol) {
+            result.push(parse_state.current_numeral().value);
             parse_state.remove_current();
-            if !current.allow_multiples {
+            if parse_state.current_numeral().max_group == parse_state.group_size {
                 parse_state.advance_numeral();
             }
         } else {
@@ -104,20 +103,28 @@ struct ParseState<'a> {
     remaining_numerals: &'static [RomanNumeral],
     numeral_pos: usize,
     remaining_to_parse: &'a str,
+    group_size: u8,
 }
 
 impl<'a> ParseState<'a> {
     fn new(to_parse: &'a str) -> Self {
-        ParseState { remaining_numerals: &ATOMS[..], numeral_pos: 0, remaining_to_parse: to_parse }
+        ParseState {
+            remaining_numerals: &ATOMS[..],
+            numeral_pos: 0,
+            remaining_to_parse:
+            to_parse,
+            group_size: 0,
+        }
     }
 
-    fn current_numeral(&self) -> RomanNumeral {
-        self.remaining_numerals[0].clone()
+    fn current_numeral(&self) -> &RomanNumeral {
+        &self.remaining_numerals[0]
     }
 
     fn advance_numeral(&mut self) {
         self.numeral_pos += 1;
         self.remaining_numerals = &ATOMS[self.numeral_pos..];
+        self.group_size = 0;
     }
 
     fn is_complete(&self) -> bool {
@@ -127,6 +134,7 @@ impl<'a> ParseState<'a> {
     fn remove_current(&mut self) {
         let skip = self.current_numeral().symbol.len();
         self.remaining_to_parse = &self.remaining_to_parse[skip..];
+        self.group_size += 1;
     }
 }
 
@@ -136,11 +144,23 @@ mod tests {
 
     #[test]
     fn reject_invalid_format() {
-        for val in ["ABCDEF", "MMDL1", "934;-)", "CMM", "ID", "MMCCD", "XLXL"].iter() {
+        let invalid_values = [
+            "ABCDEF",
+            "MMDL1",
+            "934;-)",
+            "CMM",
+            "ID",
+            "MMCCD",
+            "XLXL",
+            "IIII",
+            "VV",
+            "DDIV"
+        ];
+        for val in invalid_values.iter() {
             match roman_to_integer(*val) {
                 Err(RomanNumeralError::Unparsable(_)) => (),
-                Err(_) => panic!("wrong kind of error"),
-                Ok(_) => panic!("unexpected ok result"),
+                Err(e) => panic!("wrong kind of error: {:?}", e),
+                Ok(int_val) => panic!("unexpected ok result: {} = {}", val, int_val),
             }
         }
     }
