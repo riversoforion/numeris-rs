@@ -1,0 +1,13 @@
+[package]
+name = "numeris-cli"
+description = "Simple CLI for converting between integers and Roman numerals"
+version = "0.3.0"
+authors = ["Eric McIntyre <mac@riversoforion.com>"]
+edition = "2018"
+keywords = ["roman_numerals", "conversion"]
+categories = ["command-line-utilities", "value-formatting"]
+
+[dependencies]
+numeris = { path = "../numeris" }
+clap = "~2.33.0"
+ansi_term = "~0.12.0"
